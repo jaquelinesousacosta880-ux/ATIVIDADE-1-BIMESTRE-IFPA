@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaqueline — kUROMI SANRIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lavender-light: #e8e0f5;
+    --lavender-mid: #c9b8e8;
+    --lavender-main: #b49dd4;
+    --lavender-deep: #9478bb;
+    --lavender-dark: #6e4fa0;
+    --lavender-bg: #f4f0fb;
+    --black: #111111;
+    --white: #ffffff;
+    --gray: #888888;
+    --card-bg: #d4c5e8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    overflow-x: hidden;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--lavender-main), var(--lavender-dark));
+    z-index: 9999;
+    width: 0%;
+    transition: width .1s;
+  }
+
+  /* ── CURSOR ── */
+  *, a, button { cursor: none !important; }
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--lavender-dark);
+    border-radius: 50%;
+    position: fixed; pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%,-50%);
+    transition: width .18s, height .18s, background .2s;
+  }
+  .cursor-ring {
+    width: 34px; height: 34px;
+    border: 1.5px solid var(--lavender-main);
+    border-radius: 50%;
+    position: fixed; pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%,-50%);
+    transition: left .1s ease, top .1s ease, width .22s, height .22s;
+    opacity: .7;
+  }
+
+  /* ── CURSOR TRAIL PARTICLES ── */
+  .trail-dot {
+    position: fixed;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--lavender-main);
+    pointer-events: none;
+    z-index: 99990;
+    transform: translate(-50%,-50%);
+    animation: trail-fade .6s ease forwards;
+  }
+  @keyframes trail-fade {
+    from { opacity: .6; transform: translate(-50%,-50%) scale(1); }
+    to   { opacity: 0; transform: translate(-50%,-50%) scale(0); }
+  }
+
+  /* Clique partícula */
+  .click-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 99997;
+    font-size: 18px;
+    animation: burst .7s ease forwards;
+  }
+  @keyframes burst {
+    0%   { opacity: 1; transform: translate(-50%,-50%) scale(0); }
+    40%  { opacity: 1; transform: translate(-50%,-80%) scale(1.3); }
+    100% { opacity: 0; transform: translate(-50%,-140%) scale(.8); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 28px 48px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 rgba(180,157,212,0.2);
+    transition: box-shadow .3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 24px rgba(110,79,160,0.12); }
+
+  .nav-left a {
+    display: block; font-size: 13px; font-weight: 500;
+    color: var(--lavender-dark); text-decoration: none;
+    line-height: 1.8; transition: color .2s, letter-spacing .3s;
+  }
+  .nav-left a:first-child { font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .nav-left a:first-child::after { content: '✦'; font-size: 10px; color: var(--lavender-main); }
+  .nav-left a:not(:first-child) { color: var(--black); }
+  .nav-left a:hover { color: var(--lavender-dark); letter-spacing: 1px; }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 900;
+    letter-spacing: 8px; color: var(--lavender-dark);
+    text-transform: uppercase;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-icon svg { width: 20px; height: 20px; transition: transform .3s; }
+  .nav-icon:hover svg { transform: scale(1.2) rotate(10deg); }
+
+  /* Mood toggle button */
+  #mood-btn {
+    padding: 6px 14px; border-radius: 50px;
+    background: var(--lavender-bg); border: 1.5px solid var(--lavender-mid);
+    font-size: 12px; font-weight: 600; color: var(--lavender-dark);
+    transition: all .2s; white-space: nowrap;
+  }
+  #mood-btn:hover { background: var(--lavender-main); color: var(--white); }
+
+  /* ── DARK MODE ── */
+  body.dark {
+    --lavender-bg: #1a0e2e;
+    --white: #0d0a18;
+    --black: #f0e8ff;
+    --gray: #a080c0;
+    --card-bg: #2a1a45;
+  }
+  body.dark nav { background: rgba(13,10,24,0.9); }
+  body.dark .about-strip { border-color: #2a1a45; }
+  body.dark .brand-text p { color: #c0a0e0; }
+  body.dark footer { background: #120a22; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; padding-top: 120px; overflow: hidden;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(80px, 14vw, 180px);
+    font-weight: 900; line-height: 1; color: var(--black);
+    white-space: nowrap; position: relative; z-index: 1;
+    letter-spacing: -4px;
+    opacity: 0; transform: translateY(30px);
+    animation: heroIn 1s cubic-bezier(.16,1,.3,1) .2s forwards;
+  }
+  @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+
+  /* Glitch on hover */
+  .hero-title:hover { animation: glitch .3s steps(2,end) infinite; }
+  @keyframes glitch {
+    0%   { text-shadow: 2px 0 var(--lavender-main), -2px 0 #f0a0d0; }
+    33%  { text-shadow: -2px 0 var(--lavender-main), 2px 0 #f0a0d0; }
+    66%  { text-shadow: 2px 2px var(--lavender-deep), -2px -2px #f0a0d0; }
+    100% { text-shadow: none; }
+  }
+
+  .hero-product {
+    position: absolute; top: 50%; left: 63%;
+    transform: translate(-50%, -52%);
+    width: clamp(260px, 38vw, 480px);
+    z-index: 2;
+    animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 30px 60px rgba(148,120,187,0.35));
+    transition: filter .3s;
+  }
+  .hero-product:hover { filter: drop-shadow(0 40px 80px rgba(148,120,187,0.55)); }
+  .hero-product img { width: 100%; }
+
+  @keyframes float {
+    0%,100% { transform: translate(-50%,-52%); }
+    50%      { transform: translate(-50%,-56%); }
+  }
+
+  .hero-ornament {
+    position: absolute; top: 18%; left: 18%;
+    width: 90px; opacity: .7;
+    animation: spin 12s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hero-star {
+    position: absolute; font-size: 18px; color: var(--lavender-main);
+    animation: twinkle 3s ease-in-out infinite; pointer-events: none; z-index: 1;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity:.3; transform:scale(1); }
+    50%     { opacity:1;  transform:scale(1.3); }
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    overflow: hidden; background: var(--lavender-light);
+    padding: 14px 0;
+    border-top: 1px solid var(--lavender-mid);
+    border-bottom: 1px solid var(--lavender-mid);
+  }
+  .marquee-track {
+    display: flex; animation: marquee 20s linear infinite;
+    width: max-content;
+  }
+  .marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+  .marquee-track span {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 5px;
+    text-transform: uppercase; color: var(--lavender-dark); padding: 0 32px;
+  }
+  .marquee-track span.dot { color: var(--lavender-main); padding: 0 8px; }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* ── ABOUT STRIP ── */
+  .about-strip {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    padding: 48px 64px; border-top: 1px solid var(--lavender-light);
+  }
+  .about-strip-left .label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 2px; }
+  .about-strip-left .title { font-size: 18px; font-weight: 600; margin-top: 4px; }
+  .about-strip-right { max-width: 400px; text-align: right; }
+  .about-strip-right p { font-size: 15px; font-weight: 500; line-height: 1.5; color: var(--black); }
+
+  .btn-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    margin-top: 16px; padding: 12px 24px;
+    background: var(--lavender-main); color: var(--white);
+    border-radius: 50px; font-size: 14px; font-weight: 500;
+    text-decoration: none; border: none;
+    box-shadow: 0 4px 20px rgba(180,157,212,0.3);
+    transition: background .2s, transform .2s, box-shadow .2s;
+  }
+  .btn-pill:hover { background: var(--lavender-dark); transform: translateX(4px); box-shadow: 0 8px 32px rgba(110,79,160,0.35); }
+  .btn-pill .arrow {
+    width: 28px; height: 28px; background: var(--white); color: var(--lavender-dark);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: transform .2s;
+  }
+  .btn-pill:hover .arrow { transform: translateX(4px); }
+
+  /* ── ARRIVALS ── */
+  .arrivals {
+    background: var(--lavender-main); padding: 60px 48px;
+    position: relative; overflow: hidden;
+  }
+  .arrivals::before {
+    content: ''; position: absolute;
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    top: -150px; right: -150px;
+    animation: pulse-bg 6s ease-in-out infinite; pointer-events: none;
+  }
+  @keyframes pulse-bg { 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.15);opacity:1} }
+
+  .arrivals-tabs { display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 48px; }
+  .tab-label { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.6); transition: color .2s, letter-spacing .3s; }
+  .tab-label:hover { color: var(--white); letter-spacing: 1px; }
+  .arrivals-title { font-family: 'Playfair Display', serif; font-size: clamp(28px,4vw,48px); font-weight: 900; color: var(--white); letter-spacing: 2px; }
+
+  .arrivals-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
+
+  /* ── FLIP CARD ── */
+  .flip-card { perspective: 1000px; }
+  .flip-card-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+  }
+  .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+
+  .flip-front, .flip-back {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: var(--card-bg);
+    border-radius: 24px; padding: 32px 24px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .flip-back {
+    transform: rotateY(180deg);
+    background: var(--lavender-dark);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    text-align: center;
+  }
+  .flip-back .back-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--white); }
+  .flip-back .back-desc { font-size: 14px; color: rgba(255,255,255,.8); line-height: 1.6; }
+  .flip-back .back-icon { font-size: 48px; }
+  .flip-hint {
+    position: absolute; bottom: 12px; right: 16px;
+    font-size: 11px; color: rgba(255,255,255,.5); letter-spacing: 1px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .flip-hint::before { content: '↻'; font-size: 14px; }
+
+  /* card compartilha as propriedades do flip-front */
+  .product-card {
+    background: var(--card-bg); border-radius: 24px; padding: 32px 24px 24px;
+    position: relative;
+    transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    height: 320px;
+  }
+  .product-card:hover, .flip-front:hover {
+    box-shadow: 0 24px 60px rgba(110,79,160,0.25);
+  }
+  .flip-front::before, .product-card::before {
+    content: ''; position: absolute; top: 0; left: 20px; right: 20px;
+    height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.8), transparent);
+    border-radius: 2px; opacity: 0; transition: opacity .3s;
+  }
+  .flip-card:hover .flip-front::before { opacity: 1; }
+
+  .eco-badge {
+    position: absolute; top: 16px; left: 16px;
+    background: var(--lavender-dark); color: var(--white);
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 50px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .eco-badge::before { content: '🖤'; font-size: 10px; }
+
+  .product-img-placeholder {
+    width: 100%; height: 180px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  }
+  .product-img-placeholder img {
+    max-height: 100%; object-fit: contain;
+    transition: transform .4s cubic-bezier(.16,1,.3,1), filter .3s;
+    filter: drop-shadow(0 8px 20px rgba(110,79,160,.2));
+  }
+  .flip-card:hover .product-img-placeholder img {
+    transform: scale(1.08) translateY(-4px);
+    filter: drop-shadow(0 16px 36px rgba(110,79,160,.4));
+  }
+
+  .product-info { display: flex; justify-content: space-between; align-items: center; }
+  .product-name { font-size: 15px; font-weight: 700; color: var(--white); }
+  .product-price { font-size: 13px; color: rgba(255,255,255,.7); margin-top: 2px; }
+
+  /* ── BRAND ── */
+  .brand-section {
+    padding: 80px 64px; display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center; position: relative;
+  }
+  .brand-text p { font-size: 14px; line-height: 1.8; color: #444; margin-bottom: 16px; }
+
+  .brand-images { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 12px; position: relative; }
+  .brand-img-block {
+    border-radius: 16px; overflow: hidden; background: var(--lavender-light);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .3s;
+  }
+  .brand-img-block:hover { transform: scale(1.03); box-shadow: 0 16px 40px rgba(148,120,187,.3); }
+  .brand-img-block.tall { grid-row: span 2; min-height: 300px; }
+  .brand-img-block img { transition: transform .5s cubic-bezier(.16,1,.3,1); }
+  .brand-img-block:hover img { transform: scale(1.06); }
+
+  /* ── STATS ── */
+  .stats-band {
+    background: var(--lavender-bg); padding: 48px 64px;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 24px;
+    border-top: 1px solid var(--lavender-light);
+    border-bottom: 1px solid var(--lavender-light);
+  }
+  .stat-card {
+    text-align: center; padding: 32px 16px;
+    background: var(--white); border-radius: 20px;
+    box-shadow: 0 2px 16px rgba(180,157,212,.15);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .stat-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(110,79,160,.2); }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; color: var(--lavender-dark); line-height: 1; }
+  .stat-label { font-size: 13px; color: var(--gray); margin-top: 8px; text-transform: uppercase; letter-spacing: 2px; }
+
+  /* ── QUIZ ── */
+  .quiz-section { padding: 72px 64px; background: var(--lavender-dark); position: relative; overflow: hidden; }
+  .quiz-section::before {
+    content: '?'; font-family: 'Playfair Display', serif; font-size: 400px; font-weight: 900;
+    color: rgba(255,255,255,.04); position: absolute; top: -80px; right: -30px; pointer-events: none;
+  }
+  .quiz-title { font-family: 'Playfair Display', serif; font-size: clamp(28px,4vw,52px); font-weight: 900; color: var(--white); margin-bottom: 8px; }
+  .quiz-sub { font-size: 15px; color: rgba(255,255,255,.6); margin-bottom: 36px; }
+
+  .quiz-card {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px; padding: 32px; max-width: 680px;
+    backdrop-filter: blur(8px);
+  }
+  .quiz-question { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 24px; line-height: 1.5; }
+  .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+  .quiz-option {
+    padding: 14px 20px; border-radius: 50px;
+    background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.2);
+    color: var(--white); font-size: 14px; font-weight: 500;
+    text-align: left; transition: all .2s;
+  }
+  .quiz-option:hover:not(:disabled) { background: rgba(255,255,255,.22); border-color: rgba(255,255,255,.5); transform: translateX(6px); }
+  .quiz-option.correct { background: #4ade80; border-color: #22c55e; color: #052e16; }
+  .quiz-option.wrong   { background: #f87171; border-color: #ef4444; color: #450a0a; }
+  .quiz-option:disabled { opacity: .6; }
+  .quiz-feedback { margin-top: 20px; font-size: 15px; font-weight: 600; color: var(--white); min-height: 24px; }
+  .quiz-progress { display: flex; gap: 8px; margin-bottom: 28px; }
+  .quiz-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.2); transition: background .3s; }
+  .quiz-dot.done { background: var(--lavender-light); }
+  .quiz-dot.active { background: var(--white); box-shadow: 0 0 0 3px rgba(255,255,255,.3); }
+  #quiz-score-msg { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--white); margin-top: 12px; display: none; }
+
+  /* ── BIG LOGO ── */
+  .big-logo { padding: 40px 64px 0; overflow: hidden; }
+  .big-logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(80px,16vw,200px); font-weight: 900;
+    background: linear-gradient(100deg, var(--lavender-main) 40%, #e8d9f8 50%, var(--lavender-main) 60%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: shimmer 4s linear infinite; line-height: 1; letter-spacing: -4px;
+  }
+  @keyframes shimmer { from{background-position:200% center} to{background-position:-200% center} }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--lavender-dark); color: var(--white);
+    padding: 48px 64px; display: flex; justify-content: space-between; align-items: center;
+  }
+  footer .f-logo { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; letter-spacing: 6px; }
+  footer p { font-size: 13px; opacity: .6; margin-top: 4px; }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a { color: rgba(255,255,255,.7); text-decoration: none; font-size: 14px; transition: color .2s, letter-spacing .3s; }
+  .footer-links a:hover { color: var(--white); letter-spacing: 1px; }
+
+  /* ── BLOBS ── */
+  .blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+
+  /* ── LIGHTBOX ── */
+  #lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,.85);
+    z-index: 9000; display: none; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  #lightbox.open { display: flex; animation: lbIn .3s ease; }
+  @keyframes lbIn { from{opacity:0} to{opacity:1} }
+  #lightbox img { max-width: 80vw; max-height: 80vh; border-radius: 16px; box-shadow: 0 40px 100px rgba(0,0,0,.6); }
+  #lightbox-close {
+    position: absolute; top: 24px; right: 32px;
+    font-size: 36px; color: white; background: none; border: none; line-height: 1;
+    transition: transform .2s;
+  }
+  #lightbox-close:hover { transform: rotate(90deg) scale(1.2); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(36px); transition: opacity .85s cubic-bezier(.16,1,.3,1), transform .85s cubic-bezier(.16,1,.3,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── TOOLTIP ── */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+    background: var(--lavender-dark); color: var(--white);
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; white-space: nowrap;
+    pointer-events: none; z-index: 200;
+  }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="curRing"></div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lightbox-close">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-left">
+    <a href="#">Explore</a>
+    <a href="#">Conheça</a>
+    <a href="#quiz-section">Apaixone-se</a>
+  </div>
+  <div class="nav-logo">PURPLE</div>
+  <div class="nav-right">
+    <button id="mood-btn" data-tip="Mudar o tema">🌙 Dark</button>
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#6e4fa0" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob" style="width:500px;height:500px;background:var(--lavender-light);top:-100px;right:-100px;opacity:.5;"></div>
+  <div class="blob" style="width:300px;height:300px;background:var(--lavender-mid);bottom:50px;left:-80px;opacity:.35;"></div>
+
+  <div class="hero-star" style="top:22%;left:10%;animation-delay:0s">✦</div>
+  <div class="hero-star" style="top:35%;left:5%;animation-delay:.8s;font-size:12px">✦</div>
+  <div class="hero-star" style="top:65%;left:38%;animation-delay:1.4s;font-size:14px">✦</div>
+  <div class="hero-star" style="top:20%;right:8%;animation-delay:.4s;font-size:10px">✦</div>
+
+  <div style="position:relative;z-index:2;width:100%;text-align:center;">
+    <div class="hero-title" data-tip="Passe o mouse aqui!">KURO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MI</div>
+  </div>
+
+  <div class="hero-product">
+    <img src="KUROMI SEM FUNDO.png" width="400" height="400" alt="Kuromi" class="lightbox-trigger" data-src="KUROMI SEM FUNDO.png">
+  </div>
+
+  <div class="hero-ornament">
+    <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <path d="M40 5 Q65 5 70 30 Q80 55 55 68 Q35 80 18 65 Q0 50 5 28 Q10 5 40 5Z" fill="none" stroke="#b49dd4" stroke-width="2"/>
+    </svg>
+  </div>
+</section>
+
+<!-- MARQUEE — pausa ao hover -->
+<div class="marquee-wrap" data-tip="Passe o mouse para pausar">
+  <div class="marquee-track">
+    <span>Kuromi</span><span class="dot">✦</span>
+    <span>Sanrio</span><span class="dot">✦</span>
+    <span>Rockstar</span><span class="dot">✦</span>
+    <span>Kuro = Preto</span><span class="dot">✦</span>
+    <span>Beleza Negra</span><span class="dot">✦</span>
+    <span>Desde 2001</span><span class="dot">✦</span>
+    <span>Rebel Girl</span><span class="dot">✦</span>
+    <span>Kuromi</span><span class="dot">✦</span>
+    <span>Sanrio</span><span class="dot">✦</span>
+    <span>Rockstar</span><span class="dot">✦</span>
+    <span>Kuro = Preto</span><span class="dot">✦</span>
+    <span>Beleza Negra</span><span class="dot">✦</span>
+    <span>Desde 2001</span><span class="dot">✦</span>
+    <span>Rebel Girl</span><span class="dot">✦</span>
+  </div>
+</div>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip reveal">
+  <div class="about-strip-left">
+    <div class="label">Personagem da Sanrio</div>
+    <div class="title">A mais trevosa e rockeira da turma!</div>
+  </div>
+  <div class="about-strip-right">
+    <p>Ela é o oposto da My Melody e adora tudo que é preto. Pode parecer durona por fora, mas tem um lado sensível e adora coisas fofas.</p>
+    <button class="btn-pill" onclick="document.querySelector('.arrivals').scrollIntoView({behavior:'smooth'})">
+      Arraste para baixo
+      <span class="arrow">↓</span>
+    </button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stat-card reveal">
+    <div class="stat-num" data-count="2001" data-from="1990">1990</div>
+    <div class="stat-label">Ano de Criação</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:.1s">
+    <div class="stat-num" data-count="100" data-suffix="%" data-from="0">0%</div>
+    <div class="stat-label">Autenticidade</div>
+  </div>
+  <div class="stat-card reveal" style="transition-delay:.2s">
+    <div class="stat-num" data-count="1" data-prefix="#" data-from="10">#10</div>
+    <div class="stat-label">Rival da My Melody</div>
+  </div>
+</div>
+
+<!-- NEW ARRIVALS — flip cards -->
+<section class="arrivals">
+  <div class="arrivals-tabs">
+    <span class="tab-label">saiba mais</span>
+    <span class="arrivals-title">REPRESENTAÇÃO</span>
+    <span class="tab-label">clique para virar ↻</span>
+  </div>
+
+  <div class="arrivals-grid">
+
+    <!-- FLIP CARD 1 -->
+    <div class="flip-card product-card" onclick="this.classList.toggle('flipped')" data-tip="Clique para virar!">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="eco-badge">GUITARRA</div>
+          <div class="product-img-placeholder">
+            <img src="GUITARRA.png" width="200" height="200" alt="Guitarra" class="lightbox-trigger" data-src="GUITARRA.png">
+          </div>
+          <div class="product-info">
+            <div>
+              <div class="product-name">Rockstar</div>
+              <div class="product-price">100% rock</div>
+            </div>
+          </div>
+          <div class="flip-hint">virar</div>
+        </div>
+        <div class="flip-back">
+          <div class="back-icon">🎸</div>
+          <div class="back-title">Alma Rockeira</div>
+          <div class="back-desc">Kuromi sonha em ter uma banda de rock só dela. O barulho alto é sua linguagem do amor — e ninguém vai mudar isso!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLIP CARD 2 -->
+    <div class="flip-card product-card" onclick="this.classList.toggle('flipped')" data-tip="Clique para virar!">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="eco-badge">DIÁRIO</div>
+          <div class="product-img-placeholder">
+            <img src="DIARIO_KUROMI-removebg-preview.png" width="200" height="200" alt="Diário" class="lightbox-trigger" data-src="DIARIO_KUROMI-removebg-preview.png">
+          </div>
+          <div class="product-info">
+            <div>
+              <div class="product-name">Toda Dyva tem seus</div>
+              <div class="product-price">segredos</div>
+            </div>
+          </div>
+          <div class="flip-hint">virar</div>
+        </div>
+        <div class="flip-back">
+          <div class="back-icon">📔</div>
+          <div class="back-title">Segredos da Diva</div>
+          <div class="back-desc">Nesse diário estão seus planos secretos, suas histórias de romance favoritas e talvez uns esquemas malucos contra a My Melody...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLIP CARD 3 -->
+    <div class="flip-card product-card" onclick="this.classList.toggle('flipped')" data-tip="Clique para virar!">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="eco-badge">NAMORADO</div>
+          <div class="product-img-placeholder">
+            <img src="batsmaru_and_kurumi-removebg-preview.png" width="200" height="150" alt="Batz-Maru" class="lightbox-trigger" data-src="batsmaru_and_kurumi-removebg-preview.png">
+          </div>
+          <div class="product-info">
+            <div>
+              <div class="product-name">Batsamaru</div>
+              <div class="product-price">namorado fictício</div>
+            </div>
+          </div>
+          <div class="flip-hint">virar</div>
+        </div>
+        <div class="flip-back">
+          <div class="back-icon">🖤</div>
+          <div class="back-title">Amor Secreto</div>
+          <div class="back-desc">Ela pode fingir que é durona, mas o coração da Kuromi sempre fala mais alto. Batz-Maru é o único que consegue derreter essa rebelde.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BRAND SECTION -->
+<section class="brand-section">
+  <div class="brand-text reveal">
+    <p>"Kuro" significa preto em japonês, e o nome "Kuromi" se traduz como "beleza negra".</p>
+    <p>É um nome fofo, geralmente dado a meninas. Isso combina perfeitamente com a aparência sombria, porém bonita e charmosa, de Kuromi. Esse visual sombrio fez de Kuromi um ícone popular entre os grupos punk, scene e gótico. Kuromi é definitivamente uma garota, mas não é como a típica princesa que espera um príncipe para salvá-la. Em vez disso, ela gosta de ser ela mesma e fazer as coisas do seu jeito. Claro, ela é moleca e agitada, mas no fundo, ela é feminina e adora histórias de romance!</p>
+  </div>
+  <div class="brand-images reveal" style="transition-delay:.2s">
+    <div class="brand-img-block tall" style="background:var(--lavender-mid)">
+      <img src="KUROMI FINAL.png" width="600" height="400" alt="Kuromi Final" class="lightbox-trigger" data-src="KUROMI FINAL.png">
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="quiz-section" id="quiz-section">
+  <h2 class="quiz-title reveal">Você conhece a Kuromi?</h2>
+  <p class="quiz-sub reveal">Responda o quiz e descubra o quanto você é fã!</p>
+
+  <div class="quiz-card reveal">
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div class="quiz-question" id="quiz-q"></div>
+    <div class="quiz-options" id="quiz-opts"></div>
+    <div class="quiz-feedback" id="quiz-fb"></div>
+    <div id="quiz-score-msg"></div>
+  </div>
+</section>
+
+<!-- BIG LOGO -->
+<div class="big-logo">
+  <div class="big-logo-text">PURPLE</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="f-logo">HUSH</div>
+    <p>© 2026 SITE JAK. Aluna de informática.</p>
+  </div>
+  <div class="footer-links">
+    <a href="#">Início</a>
+    <a href="#quiz-section">Quiz</a>
+    <a href="#">Galeria</a>
+  </div>
+</footer>
+
+<script>
+/* ── CURSOR ── */
+const cur = document.getElementById('cur');
+const ring = document.getElementById('curRing');
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left  = mx + 'px'; cur.style.top  = my + 'px';
+  ring.style.left = mx + 'px'; ring.style.top = my + 'px';
+  spawnTrail(mx, my);
+});
+document.querySelectorAll('a,button,.flip-card,.brand-img-block,.stat-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cur.style.width = '20px'; cur.style.height = '20px';
+    cur.style.background = 'var(--lavender-deep)';
+    ring.style.width = '52px'; ring.style.height = '52px';
+  });
+  el.addEventListener('mouseleave', () => {
+    cur.style.width = '12px'; cur.style.height = '12px';
+    cur.style.background = 'var(--lavender-dark)';
+    ring.style.width = '34px'; ring.style.height = '34px';
+  });
+});
+
+/* ── TRAIL ── */
+let lastTrail = 0;
+function spawnTrail(x, y) {
+  const now = Date.now();
+  if (now - lastTrail < 40) return;
+  lastTrail = now;
+  const d = document.createElement('div');
+  d.className = 'trail-dot';
+  d.style.left = x + 'px'; d.style.top = y + 'px';
+  d.style.background = Math.random() > .5 ? 'var(--lavender-main)' : 'var(--lavender-mid)';
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 600);
+}
+
+/* ── CLICK BURST ── */
+const emojis = ['✦','🖤','♪','⭐','🌙','💜'];
+document.addEventListener('click', e => {
+  const el = document.createElement('div');
+  el.className = 'click-burst';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.left = e.clientX + 'px'; el.style.top = e.clientY + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 700);
+});
+
+/* ── PROGRESS BAR ── */
+const bar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const p = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  bar.style.width = (p * 100) + '%';
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ── DARK MODE ── */
+const moodBtn = document.getElementById('mood-btn');
+moodBtn.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  moodBtn.textContent = document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+});
+
+/* ── SCROLL REVEAL ── */
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+/* ── COUNT-UP ── */
+function countUp(el) {
+  const to   = parseInt(el.dataset.count);
+  const from = parseInt(el.dataset.from) || 0;
+  const pre  = el.dataset.prefix || '';
+  const suf  = el.dataset.suffix || '';
+  const dur  = 1400;
+  const step = 16;
+  const steps = dur / step;
+  let i = 0;
+  const id = setInterval(() => {
+    i++;
+    const val = Math.round(from + (to - from) * (i / steps));
+    el.textContent = pre + val + suf;
+    if (i >= steps) { el.textContent = pre + to + suf; clearInterval(id); }
+  }, step);
+}
+const statObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-count]').forEach(countUp);
+      statObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.4 });
+document.querySelectorAll('.stat-card').forEach(el => statObs.observe(el));
+
+/* ── LIGHTBOX ── */
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightbox-img');
+document.querySelectorAll('.lightbox-trigger').forEach(img => {
+  img.addEventListener('click', e => {
+    e.stopPropagation();
+    lbImg.src = img.dataset.src || img.src;
+    lb.classList.add('open');
+  });
+});
+document.getElementById('lightbox-close').addEventListener('click', () => lb.classList.remove('open'));
+lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+
+/* ── QUIZ ── */
+const questions = [
+  { q: 'O que significa "Kuro" em japonês?', opts: ['Roxo','Preto','Estrela','Coragem'], ans: 1 },
+  { q: 'Em que ano Kuromi foi criada pela Sanrio?', opts: ['1999','2003','2001','2005'], ans: 2 },
+  { q: 'Qual é o grande rival da Kuromi na Sanrio?', opts: ['Hello Kitty','Cinnamoroll','Pompompurin','My Melody'], ans: 3 },
+  { q: 'O que Kuromi carrega sempre com ela?', opts: ['Uma guitarra','Um diário','Uma câmera','Um espelho'], ans: 1 },
+  { q: 'Qual o nome do namorado fictício da Kuromi?', opts: ['Batz-Maru','Keroppi','Tuxedosam','Hangyodon'], ans: 0 },
+];
+
+let qIdx = 0, score = 0;
+const qEl   = document.getElementById('quiz-q');
+const optsEl = document.getElementById('quiz-opts');
+const fbEl  = document.getElementById('quiz-fb');
+const progEl = document.getElementById('quiz-progress');
+const scoreMsg = document.getElementById('quiz-score-msg');
+
+function buildProgress() {
+  progEl.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'quiz-dot' + (i < qIdx ? ' done' : i === qIdx ? ' active' : '');
+    progEl.appendChild(d);
+  });
+}
+
+function loadQuestion() {
+  if (qIdx >= questions.length) {
+    qEl.textContent = '🎉 Quiz completo!';
+    optsEl.innerHTML = '';
+    fbEl.textContent = '';
+    scoreMsg.style.display = 'block';
+    const msgs = ['Ainda tem muito a aprender... 📚','Você sabe mais do que parece! 💜','Quase uma especialista! ✦','Você É a Kuromi! 🖤🎸'];
+    const tier = score <= 1 ? 0 : score <= 3 ? 1 : score === 4 ? 2 : 3;
+    scoreMsg.textContent = `Acertou ${score} de ${questions.length}! ${msgs[tier]}`;
+    buildProgress();
+    return;
+  }
+  const cur = questions[qIdx];
+  qEl.textContent = cur.q;
+  optsEl.innerHTML = '';
+  fbEl.textContent = '';
+  buildProgress();
+  cur.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => {
+      optsEl.querySelectorAll('button').forEach(b => b.disabled = true);
+      if (i === cur.ans) {
+        btn.classList.add('correct');
+        fbEl.textContent = '✅ Certa! Kuromi aprova!';
+        score++;
+      } else {
+        btn.classList.add('wrong');
+        optsEl.querySelectorAll('button')[cur.ans].classList.add('correct');
+        fbEl.textContent = '❌ Errou! Mas não desanime!';
+      }
+      setTimeout(() => { qIdx++; loadQuestion(); }, 1400);
+    });
+    optsEl.appendChild(btn);
+  });
+}
+
+loadQuestion();
+
+/* ── PARALLAX HERO ── */
+document.addEventListener('mousemove', e => {
+  const bag = document.querySelector('.hero-product');
+  if (!bag) return;
+  const x = (e.clientX / window.innerWidth  - 0.5) * 18;
+  const y = (e.clientY / window.innerHeight - 0.5) * 10;
+  bag.style.transform = `translate(calc(-50% + ${x}px), calc(-52% + ${y}px))`;
+});
+</script>
+</body>
+</html>
